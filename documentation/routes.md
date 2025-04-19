@@ -1,4 +1,3 @@
-
 # Route Architecture
 
 The application implements a clean, layered routing architecture that aligns with the overall clean architecture of the application. The routing system is designed to support offline-first capabilities, state preservation, and deep linking.
@@ -176,7 +175,7 @@ final router = GoRouter(
 );
 ```
 
-# Offline Routing Strategy
+## Offline Routing Strategy
 
 The application implements a special offline routing strategy to handle navigation when the device is offline:
 
@@ -220,7 +219,7 @@ The application implements a special offline routing strategy to handle navigati
    - Processing it when connectivity is restored
    - Providing appropriate feedback to the user about the offline status
 
-# Route Parameters and Data Passing
+## Route Parameters and Data Passing
 
 The application uses strongly typed route parameters for type safety:
 
@@ -263,7 +262,7 @@ class ChatRouteParams {
 }
 ```
 
-# Navigation Integration with Repository Pattern
+## Navigation Integration with Repository Pattern
 
 The navigation system integrates with the repository pattern to handle data-dependent navigation:
 
@@ -304,7 +303,7 @@ class ChatNavigationUseCase {
 }
 ```
 
-# State Preservation During Navigation
+## State Preservation During Navigation
 
 The application preserves important state during navigation using a combination of:
 
@@ -342,7 +341,7 @@ void handleShareIntent(Uri deepLink) {
 }
 ```
 
-# Navigation Strategy
+## Navigation Strategy
 
 The application uses a combination of navigation approaches:
 
@@ -371,3 +370,192 @@ The navigation system is designed to handle the offline-first approach by:
 - Providing clear UI indicators for offline mode
 - Queuing navigation actions that require online connectivity
 - Supporting seamless recovery when coming back online
+
+## TypedGoRoute Implementation
+
+The application uses a more type-safe approach with `TypedGoRoute` annotations for better compile-time safety and code organization:
+
+```dart
+// core/navigation/routes.dart
+
+@TypedGoRoute<SplashRoute>(path: '/splash')
+class SplashRoute extends GoRouteData2 {
+  final BagDataRoute? $extra;
+  SplashRoute({this.$extra});
+  @override
+  Widget binding(BuildContext context) {
+    return const SplashScreen();
+  }
+}
+
+@TypedGoRoute<LoginRoute>(path: '/login')
+class LoginRoute extends GoRouteData2 {
+  final BagDataRoute? $extra;
+
+  LoginRoute({this.$extra});
+
+  @override
+  Widget binding(BuildContext context) => LoginScreen();
+}
+
+@TypedGoRoute<SignUpRoute>(path: '/signup')
+class SignUpRoute extends GoRouteData2 {
+  final BagDataRoute? $extra;
+
+  SignUpRoute({this.$extra});
+
+  @override
+  Widget binding(BuildContext context) {
+    return SignUpScreen();
+  }
+}
+
+@TypedGoRoute<HomeScreenRoute>(path: '/', routes: [
+  // Chat routes
+  TypedGoRoute<ChatListRoute>(path: 'chats', routes: [
+    TypedGoRoute<ChatRoute>(path: ':chatId', routes: [
+      TypedGoRoute<MediaGalleryRoute>(path: 'media'),
+    ]),
+  ]),
+  
+  // Contacts route
+  TypedGoRoute<ContactListRoute>(path: 'contacts'),
+  
+  // Settings routes
+  TypedGoRoute<ProfileSettingsRoute>(path: 'settings', routes: [
+    TypedGoRoute<MediaCompressionSettingsRoute>(path: 'media-compression'),
+    TypedGoRoute<StorageUsageRoute>(path: 'storage'),
+    TypedGoRoute<ChatHistoryRoute>(path: 'history'),
+  ]),
+])
+class HomeScreenRoute extends GoRouteData2 {
+  final BagDataRoute? $extra;
+  final String? view;
+  final String? tab;
+
+  static HomeScreenController? instance;
+
+  HomeScreenRoute({this.$extra, this.view, this.tab});
+
+  @override
+  FutureOr<String?> redirectWithBag(BuildContext context, BagDataRoute extra) => _signRedirect(context, extra);
+
+  @override
+  Widget binding(BuildContext context) {
+    return KeepAliveWidget(
+      child: HomeScreen(controller: instance ??= HomeScreenController(homeView: HomeView.getOfName(view), tab: tab)),
+    );
+  }
+}
+
+// Example of a route with parameters
+class ChatRoute extends GoRouteData2 {
+  final String chatId;
+  final BagDataRoute? $extra;
+  final bool isGroup;
+
+  ChatRoute({
+    required this.chatId,
+    this.$extra,
+    this.isGroup = false,
+  });
+
+  @override
+  Widget binding(BuildContext context) {
+    return IndividualChatScreen(
+      chatId: chatId,
+      isGroup: isGroup,
+    );
+  }
+}
+
+// Route that supports offline mode
+class MediaGalleryRoute extends GoRouteData2 {
+  final String chatId;
+  final BagDataRoute? $extra;
+  final bool offlineMode;
+
+  MediaGalleryRoute({
+    required this.chatId,
+    this.$extra,
+    this.offlineMode = false,
+  });
+
+  @override
+  FutureOr<String?> redirectWithBag(BuildContext context, BagDataRoute extra) {
+    final connectivityService = serviceLocator<ConnectivityService>();
+    if (!connectivityService.isConnected && !offlineMode) {
+      // Show offline indicator and potentially return alternate route
+      return null; // Or return fallback route
+    }
+    return null;
+  }
+
+  @override
+  Widget binding(BuildContext context) {
+    return MediaGalleryScreen(
+      chatId: chatId,
+      offlineMode: offlineMode,
+    );
+  }
+}
+```
+
+## Benefits of TypedGoRoute Approach
+
+The TypedGoRoute approach offers several advantages over the traditional GoRouter implementation:
+
+1. **Type Safety**: Routes are strongly typed with parameters that can be validated at compile-time.
+
+2. **Cleaner Navigation**: Navigation uses generated extension methods that provide IDE autocompletion.
+
+3. **Parameter Validation**: Required route parameters are enforced through the constructor.
+
+4. **Redirect Logic Encapsulation**: Each route can encapsulate its own redirect logic through the `redirectWithBag` method.
+
+5. **Extra Data Support**: The `$extra` parameter allows passing additional non-URL data during navigation.
+
+## Navigation Implementation with TypedGoRoute
+
+Using the typed approach simplifies navigation throughout the application:
+
+```dart
+// Navigate to a chat
+context.go(ChatRoute(
+  chatId: 'chat-123',
+  isGroup: true,
+).location);
+
+// Or using the extension methods generated by go_router_builder
+ChatRoute(
+  chatId: 'chat-123',
+  isGroup: true,
+).go(context);
+
+// Navigating with extra data
+LoginRoute(
+  $extra: BagDataRoute(
+    data: {'lastVisited': DateTime.now()},
+  ),
+).go(context);
+```
+
+## Unified State Management
+
+The TypedGoRoute pattern integrates well with the application's state management approach:
+
+1. **BagDataRoute**: A custom container for passing complex state objects during navigation.
+
+2. **Controller Pattern**: Routes can instantiate and maintain controllers, such as the HomeScreenController.
+
+3. **Keep-Alive State**: The KeepAliveWidget helps preserve widget state during tab navigation.
+
+## Offline Handling with TypedGoRoute
+
+The TypedGoRoute pattern enhances offline handling through:
+
+1. **Route-level Offline Checks**: Each route can implement offline detection in its redirectWithBag method.
+
+2. **Offline Mode Parameters**: Routes like MediaGalleryRoute accept an offlineMode parameter to adjust behavior.
+
+3. **State Preservation**: The KeepAliveWidget helps maintain state during connectivity changes.
