@@ -42,10 +42,10 @@ graph TB
         UI["UI Layer"]
         BL["Business Logic Layer"]
         DL["Data Layer"]
-        LS["Local Storage (Hive/SQLite)"]
+        LS["Local Storage (Hive)"]
         NM["Network Monitor"]
         subgraph "State Management"
-            SM["Provider/Bloc"]
+            SM["Provider"]
         end
     end
     
@@ -203,6 +203,80 @@ stateDiagram-v2
             CheckPendingQueue --> [*]: No Pending Messages
         }
     }
+```
+
+#### Folder structure
+
+```text
+project_root/
+├── lib/
+│   ├── core/                      # Core application code
+│   │   ├── constants/             # App constants, theme data, string resources
+│   │   ├── errors/                # Custom error handling
+│   │   ├── navigation/            # Navigation service, route generation
+│   │   ├── network/               # Network monitoring, connectivity service
+│   │   ├── utils/                 # Utility functions and helpers
+│   │   └── widgets/               # Shared widgets used across features
+│   │
+│   ├── data/                      # Data layer
+│   │   ├── datasources/
+│   │   │   ├── local/             # Local data sources (Hive implementations)
+│   │   │   └── remote/            # Remote data sources (Firebase implementations)
+│   │   ├── models/                # Data models
+│   │   │   ├── chat.dart
+│   │   │   ├── message.dart
+│   │   │   ├── user.dart
+│   │   │   └── media.dart
+│   │   └── repositories/          # Repository implementations
+│   │
+│   ├── domain/                    # Domain layer
+│   │   ├── entities/              # Domain entities
+│   │   ├── repositories/          # Repository interfaces
+│   │   └── usecases/              # Business logic use cases
+│   │
+│   ├── features/                  # Feature modules
+│   │   ├── auth/                  # Authentication feature
+│   │   │   ├── presentation/      # UI components
+│   │   │   ├── domain/            # Feature-specific domain logic
+│   │   │   └── data/              # Feature-specific data handling
+│   │   │
+│   │   ├── chat/                  # Chat feature
+│   │   │   ├── presentation/
+│   │   │   │   ├── screens/       # Chat screens
+│   │   │   │   ├── widgets/       # Chat-specific widgets
+│   │   │   │   └── bloc/          # State management
+│   │   │   ├── domain/            # Chat domain logic
+│   │   │   └── data/              # Chat data handling
+│   │   │
+│   │   ├── media/                 # Media handling feature
+│   │   │   ├── presentation/
+│   │   │   ├── domain/
+│   │   │   └── data/
+│   │   │
+│   │   └── settings/              # User settings feature
+│   │
+│   ├── services/                  # Service layer
+│   │   ├── auth_service.dart      # Authentication service
+│   │   ├── media_service.dart     # Media handling service
+│   │   ├── sync_service.dart      # Synchronization service
+│   │   └── storage_service.dart   # Local storage service
+│   │
+│   ├── di/                        # Dependency injection
+│   │   └── service_locator.dart   # Service locator implementation
+│   │
+│   ├── app.dart                   # App widget and initialization
+│   └── main.dart                  # Entry point
+│
+├── assets/                        # Static assets
+│   ├── images/                    # Image assets
+│   ├── fonts/                     # Custom fonts
+│   └── animations/                # Lottie animations
+│
+├── test/                          # Test files mirroring lib structure
+├── android/                       # Android-specific code
+├── ios/                           # iOS-specific code
+├── pubspec.yaml                   # Dependencies
+└── README.md                      # Project documentation
 ```
 
 ### Design Patterns
@@ -506,7 +580,7 @@ classDiagram
 
 - Flutter for cross-platform mobile development
 - BLoC pattern for state management
-- Navigator 2.0/Go Router for app navigation
+- Go Router for app navigation
 
 #### Backend
 
@@ -747,7 +821,7 @@ media/{chatId}/{mediaType}/{filename}
 
 ### Phase 3: Offline Support
 
-- Implement local storage for messages using Hive/SQLite
+- Implement local storage for messages using Hive
 - Create chat-specific storage structure
 - Set up synchronization mechanism
 - Create network status monitoring
@@ -781,10 +855,10 @@ media/{chatId}/{mediaType}/{filename}
 
 - **Flutter & Dart**: Core framework
 - **Firebase**: firebase_core, firebase_auth, cloud_firestore, firebase_storage
-- **State Management**: provider/flutter_bloc
+- **State Management**: provider
 - **Networking**: connectivity_plus, flutter_offline
-- **Local Storage**: hive/sqflite for local database and offline storage
-- **Media Handling**: image_picker, cached_network_image
+- **Local Storage**: hive for local database and offline storage
+- **Media Handling**: image_picker, cached_network_image and other media handling libraries
 
 ### Performance Considerations
 

@@ -11,14 +11,10 @@
             "id": "8a784d5408be5e5e",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "readme.md",
-                "mode": "preview",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "readme"
+              "title": "New tab"
             }
           }
         ]
@@ -78,8 +74,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "77f676bc62597c3c",
@@ -171,6 +166,34 @@
   },
   "active": "8a784d5408be5e5e",
   "lastOpenFiles": [
-    "readme-ar.md"
+    "documentation/routes copy.md",
+    "readme.md",
+    "documentation/screen.md",
+    "documentation/routes.md",
+    "documentation/readme.md",
+    "documentation/screens/splash_screen.md",
+    "documentation/screens/profile_settings_screen.md",
+    "documentation/screens/media_selection_preview_screen.md",
+    "documentation/screens/media_gallery_screen.md",
+    "documentation/screens/login_screen.md",
+    "documentation/screens/document_viewer_screen.md",
+    "documentation/screens/contact_list_screen.md",
+    "documentation/screens/chat_screen.md",
+    "documentation/screens/chat_list_screen.md",
+    "documentation/screens",
+    "documentation",
+    "screens/media_selection_preview_screen.md",
+    "screens/document_viewer_screen.md",
+    "screens/media_gallery_screen.md",
+    "screens/profile_settings_screen.md",
+    "routes.md",
+    "screens/contact_list_screen.md",
+    "screen.md",
+    "screens/chat_screen.md",
+    "screens/individual_chat_screen.md",
+    "screens/chat_list_screen.md",
+    "screens/login_screen.md",
+    "screens/splash_screen.md",
+    "screens"
   ]
 }
